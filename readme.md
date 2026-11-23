@@ -12,15 +12,15 @@ A secondary motivation was to provide desktop configuration and management and a
 <p align="center">
   <a href="app/house/admin/docs/attention.png"><img src="app/house/admin/docs/attention.png" width="820" alt="The Dmain admin app's Attention screen: one line for each thing that differs from what it should be, and the latest events from both networks"></a>
   <br>
-  <sub><b>Attention</b>, the admin app's home screen: what differs from what it should be, one line each, and the latest events from both networks. <a href="#the-admin-app">more below</a>.</sub>
+  <sub><b>Attention screen</b>, the admin app's home screen: what differs from what it should be, one line each, and the latest events from both networks. <a href="#the-admin-app">more below</a>.</sub>
 </p>
 
-## Things to know before reading further
+## What to expect
 - **It is functionally specific, not a general platform.** A core design aim was to work directly with specific devices for a small range of functions (light, motion, humidity, temperature, socket switching). There are no adaptors or abstractions for devices it doesn't have (xkcd 927, obviously). Treat it as a worked example to adapt and build-on, not as a black-box platform to install (if you are looking for a ready-made, local, easy to use platform with **vast** compatibility reach, then try the Home Assistant ecosystem).
 - **The configuration in this repository is a real house's.** Rooms, device names, addresses and schedules are published as they are, because they are the clearest example of what the files hold. Replace them with your own.
 - **The code has been written with the help of AI.** If that rules it out for you, then I respect your dedication to the craft and wish you well.
 
-## What is here
+## Where to find it
 
 | Path | What it is |
 |---|---|
