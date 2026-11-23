@@ -12,7 +12,7 @@ A secondary motivation was to provide desktop configuration and management and a
 <p align="center">
   <a href="app/house/admin/docs/attention.png"><img src="app/house/admin/docs/attention.png" width="820" alt="The Dmain admin app's Attention screen: one line for each thing that differs from what it should be, and the latest events from both networks"></a>
   <br>
-  <sub><b>Attention</b>, the admin app's home screen: what differs from what it should be, one line each, and the latest events from both networks. A design mock; <a href="#the-admin-app">more below</a>.</sub>
+  <sub><b>Attention</b>, the admin app's home screen: what differs from what it should be, one line each, and the latest events from both networks. <a href="#the-admin-app">more below</a>.</sub>
 </p>
 
 ## Things to know before reading further
@@ -42,7 +42,7 @@ Each package builds and tests on its own (`cd lib/hue && zig build test`). The r
 
 One window: a sidebar of screens, each with ⌘-digit shortcuts, and a count of the rows that differ on each one. Orange means a row differs from what it should be and red means something is broken. A row that matches stays plain. The app only draws: every row, mark and dry run comes from `dmain admin <server> --json`.
 
-These are design mocks rendered from `app/house/admin/docs/mocks.html` (`docs/render.sh`), so **every value in them is made up**. The app has gained Rooms, device and network pages since they were drawn. Click an image for full size.
+Click an image for full size.
 
 <table>
   <tr>
