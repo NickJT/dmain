@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Nightly mirror of the server's capture and house log into app/house/huelog/data/.
+
+  The server's disk is the record; this is the second copy. launchd runs a
+  calendar job missed while the Mac slept once on wake, and rsync only moves
+  what changed, so a missed night costs nothing.
+
+  Replace YOU below with your user name and the checkout's path if it is not
+  ~/dmain, then
+  Install:   cp deploy/huelog-pull.plist ~/Library/LaunchAgents/
+             launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/huelog-pull.plist
+  Remove:    launchctl bootout gui/$(id -u)/local.huelog.pull
+  Last run:  ~/Library/Logs/huelog-pull.log (not /tmp, which a reboot empties)
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>local.huelog.pull</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOU/dmain/app/house/huelog/tools/pull.sh</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>0</integer>
+        <key>Minute</key>
+        <integer>15</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>/Users/YOU/Library/Logs/huelog-pull.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOU/Library/Logs/huelog-pull.log</string>
+</dict>
+</plist>

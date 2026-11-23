@@ -1,0 +1,24 @@
+# dmain as a service on the house server, as the user who owns ~/dmain, not root.
+#
+# Installed by app/house/deploy.sh <server> dmain.
+#
+# Watch it: journalctl _SYSTEMD_USER_UNIT=dmain.service -f -o cat
+
+[Unit]
+Description=dmain — the house's combined state and phone pages
+# Never stop restarting: systemd's default start limit gives up after five quick
+# starts, and a boot-time crash loop would end with no pages at all.
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/dmain
+ExecStart=%h/dmain/dmain serve
+Restart=always
+RestartSec=5
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target

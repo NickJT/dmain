@@ -1,0 +1,33 @@
+{
+ "sensor": "cc:36:bb:ff:fe:02:e1:39",
+ "name": "hum1",
+ "reference": {
+  "dev": "00:17:88:01:0b:09:d6:16",
+  "label": "TV Room",
+  "correction": 2.09
+ },
+ "placement": "beside the TV Room Hue sensor from about 16:00 on 2026-11-11",
+ "window": [
+  "2026-11-11T23:00:00Z",
+  "2026-11-12T06:00:00Z"
+ ],
+ "method": "each reading held until the next, sampled each minute; offset = reference corrected - hum1 raw",
+ "minutes": 420,
+ "correction": -0.38,
+ "stdev": 0.22,
+ "range": [
+  -0.9,
+  0.18
+ ],
+ "hourly": {
+  "23": -0.12,
+  "00": -0.22,
+  "01": -0.42,
+  "02": -0.29,
+  "03": -0.43,
+  "04": -0.49,
+  "05": -0.68
+ },
+ "drift": "widened by about 0.5 as the room cooled 2 degrees; against temperature r 0.25, slope 0.12 per degree, so mostly not the sensor's response",
+ "humidity": "not calibrated: no humidity reference in the room"
+}

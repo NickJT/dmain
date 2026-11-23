@@ -1,0 +1,10 @@
+{
+  "devices": [
+    { "name": "moisture", "ieee": "8c:73:da:ff:fe:29:38:57", "room": "Bathroom" },
+    { "name": "motion2", "ieee": "00:12:4b:00:22:d0:f2:c3", "room": "Bedroom 2" },
+    { "name": "power1", "ieee": "00:12:4b:00:24:c0:1d:a3", "room": "Bedroom 2" },
+    { "name": "dimmer2", "ieee": "00:17:88:01:0e:de:e0:57", "room": "Bedroom 2" },
+    { "name": "panel", "ieee": "00:17:88:01:0e:7d:d5:ad", "room": "Bedroom 2" },
+    { "name": "hum1", "ieee": "cc:36:bb:ff:fe:02:e1:39", "room": "Ensuite" }
+  ]
+}

@@ -1,0 +1,19 @@
+.{
+    .name = .zigbee,
+    .version = "0.0.0",
+    .fingerprint = 0x47a940f9bf68e0ca, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.17.0",
+    // `util` for the serial device only. This package was the bottom of its own
+    // stack until `serial.zig` moved out of it: a raw 8N1 character device knows
+    // nothing about Zigbee, and leaving it here meant another application reaching
+    // sideways into a Zigbee package to open a `/dev/cu.*`.
+    .dependencies = .{
+        .util = .{ .path = "../util" },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "example",
+    },
+}

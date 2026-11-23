@@ -1,0 +1,14 @@
+.{
+    .name = .dmain_workspace,
+    .version = "0.0.0",
+    .fingerprint = 0x6308fd1b6d2cf24d,
+    .minimum_zig_version = "0.17.0",
+    // None, deliberately: `build.zig` shells out to each package's own build,
+    // because Zig shares modules and artifacts across packages but not the
+    // named steps this file aggregates.
+    .dependencies = .{},
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+    },
+}

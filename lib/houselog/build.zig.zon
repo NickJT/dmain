@@ -1,0 +1,14 @@
+.{
+    .name = .houselog,
+    .version = "0.0.0",
+    .fingerprint = 0x82c9e8e0d9a02f5d, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{
+        .util = .{ .path = "../util" },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

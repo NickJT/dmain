@@ -1,0 +1,8 @@
+{
+  "rules": [
+    { "controller": "motion2", "event": "alarm", "action": "on", "target": "panel" },
+    { "controller": "motion2", "event": "clear", "action": "off", "target": "panel" },
+    { "controller": "hum1", "event": "humid", "action": "on", "target": "00:17:88:01:0f:09:8a:e0" },
+    { "controller": "hum1", "event": "dry", "action": "off", "target": "00:17:88:01:0f:09:8a:e0" }
+  ]
+}

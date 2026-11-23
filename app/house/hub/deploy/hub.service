@@ -1,0 +1,48 @@
+# hub as a service on the house server. Nothing here needs root: a user unit has the
+# user's own groups, including `dialout` for the radio.
+#
+# Installed by app/house/deploy.sh <server> hub. Once, on the server, so it runs
+# with nobody logged in:   loginctl enable-linger $USER
+#
+# The console: ssh -t <server> 'cd ~/hub && ./hub console'
+# One command: ssh <server> 'cd ~/hub && ./hub console reload'
+# Watch it:    journalctl _SYSTEMD_USER_UNIT=hub.service -f -o cat
+#              (`journalctl --user` can find nothing; the system journal has it.)
+#              ~/hub/hub.log has the same lines, timestamped, and survives restarts.
+
+[Unit]
+Description=hub — Zigbee home control
+# Never stop restarting. systemd's default start limit gives up after 5 starts
+# in 10s, which is exactly the 2am failure this unit exists to prevent.
+StartLimitIntervalSec=0
+# Best-effort ordering only: hub waits for the radio if it isn't there yet, so
+# USB enumeration losing a race with systemd is a non-event. The name is this
+# house's radio by USB serial number: `ls /dev/serial/by-id/` gives yours.
+Wants=dev-serial-by\x2did-usb\x2dNabu_Casa_ZBT\x2d2_E072A1D9E42C\x2dif00.device
+After=dev-serial-by\x2did-usb\x2dNabu_Casa_ZBT\x2d2_E072A1D9E42C\x2dif00.device
+
+[Service]
+Type=simple
+# hub reads devices.json, rules.json, groups.json and schedule.json from here,
+# writes its state and log here, and puts hub.sock here. Started from the wrong
+# directory it comes up with no names, no rules and no groups.
+WorkingDirectory=%h/hub
+# 8081, leaving 8080 free.
+ExecStart=%h/hub/hub --port 8081
+
+# Restart on anything: crash, panic, or a clean exit that wasn't asked for.
+Restart=always
+RestartSec=5
+
+# stdin is /dev/null: hub sees EOF on a non-tty and goes headless. Use
+# `hub console` for commands.
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+
+# NOTE: no SupplementaryGroups=dialout. It needs root to change group
+# credentials, so in a --user unit it fails the service outright
+# (`status=216/GROUP`).
+
+[Install]
+WantedBy=default.target

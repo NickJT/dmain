@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<title>Rooms</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  <div id="banner" role="status"></div>
+  <ul id="alarms" class="compact"></ul>
+  <ul id="rows" class="compact"></ul>
+  <footer><span id="foot">Loading…</span><a href="/">Temperatures</a><a href="/motion">Motion</a></footer>
+</main>
+<script src="/common.js"></script>
+<script>
+  const rows = document.getElementById("rows");
+  const alarms = document.getElementById("alarms");
+
+  function item(label, detail, right, rightClass, rowClass) {
+    const li = document.createElement("li");
+    if (rowClass) li.classList.add(rowClass);
+    const left = document.createElement("div");
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = label;
+    const sub = document.createElement("div");
+    sub.className = "age";
+    sub.textContent = detail;
+    left.append(name, sub);
+    const state = document.createElement("div");
+    state.className = "when" + (rightClass ? " " + rightClass : "");
+    state.textContent = right;
+    li.append(left, state);
+    return li;
+  }
+
+  // Built with textContent throughout: names come from the house's devices, and
+  // nothing from them is ever parsed as markup.
+  function render(d) {
+    alarms.replaceChildren(...d.alarms.map((a) => {
+      // A leak seen before the sensor or its source went quiet isn't over because
+      // of the silence, so it stays an alarm, and says it can't be sure.
+      if (a.lost && a.on) return item(a.name, "ALARM when last heard " + ago(a.age_s, "") + ", not responding now", "ALARM?", "alarm", "alarmed");
+      if (a.lost) return item(a.name, "not responding: last heard " + ago(a.age_s, "never"), "?", "", "stale");
+      const when = a.on ? "now" : a.tripped_age_s == null ? "not since this log began" : "last " + ago(a.tripped_age_s, "");
+      return item(a.name, (a.on ? "ALARM " : "Clear, alarm ") + when, a.on ? "ALARM" : "Clear", a.on ? "alarm" : "", a.on ? "alarmed" : "");
+    }));
+    rows.replaceChildren(...d.rooms.map((r) => {
+      const total = r.known + r.lost;
+      const missing = r.lost ? ", " + r.lost + " not responding" : "";
+      const detail = r.state === "unknown" ? "not responding" : r.on + " of " + total + " on" + missing;
+      const right = r.state === "on" ? "On" : r.state === "off" ? "Off" : "?";
+      return item(r.room, detail, right, r.state === "on" ? "now" : "", r.state === "unknown" ? "stale" : "");
+    }));
+  }
+
+  poll("/api/rooms", render);
+</script>
+</body>
+</html>

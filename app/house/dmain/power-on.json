@@ -1,0 +1,8 @@
+{
+  "v": 1,
+  "default": {
+    "power_on": "previous",
+    "bri_previous": true
+  },
+  "except": []
+}

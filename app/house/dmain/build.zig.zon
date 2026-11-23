@@ -1,0 +1,14 @@
+.{
+    .name = .dmain,
+    .version = "0.0.0",
+    .fingerprint = 0x34fc34e834bc946f,
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{
+        .util = .{ .path = "../../../lib/util" },
+        .houselog = .{ .path = "../../../lib/houselog" },
+        .httpd = .{ .path = "../../../lib/httpd" },
+        .hue = .{ .path = "../../../lib/hue" },
+        .tui = .{ .path = "../../../lib/tui" },
+    },
+    .paths = .{ "build.zig", "build.zig.zon", "src" },
+}

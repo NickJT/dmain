@@ -1,0 +1,24 @@
+{
+  "port": 8082,
+  "hue_log": "../huelog/data/house",
+  "hub_log": "../hub/data/house",
+  "display_config": "display.json",
+  "rooms": [
+    "Bathroom",
+    "Bedroom",
+    "Bedroom 2",
+    "Bedroom 3",
+    "Bedroom Radiator",
+    "Ensuite",
+    "Garage",
+    "Hallway",
+    "Kitchen",
+    "Landing",
+    "Lounge",
+    "Outside",
+    "Services",
+    "Study",
+    "TV Room",
+    "Utility"
+  ]
+}

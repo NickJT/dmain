@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hale Farm Cottage</title>
+<style>
+  body { font: 15px/1.4 -apple-system, sans-serif; margin: 0; padding: 1rem; background: #14181f; color: #e6e9ef; }
+  h1 { font-size: 1.1rem; margin: 0 0 1rem; color: #8fb4ff; }
+  h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: #7a8399; margin: 1.5rem 0 0.5rem; }
+  h2:first-of-type { margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid #262c38; font-size: 0.9rem; }
+  th { color: #7a8399; font-weight: 500; }
+  .dim { color: #7a8399; }
+  .left { color: #d9695f; }
+  .state-on { color: #7ad48c; }
+  .state-off { color: #7a8399; }
+  .state-unknown { color: #7a8399; font-style: italic; }
+  .status-ok { color: #7a8399; }
+  .status-alert { color: #d9695f; font-weight: 600; }
+  button { background: #232a38; color: #e6e9ef; border: 1px solid #333c4d; border-radius: 4px; padding: 0.3rem 0.7rem; margin-right: 0.3rem; cursor: pointer; font-size: 0.85rem; }
+  button:hover { background: #2c3444; }
+  button:active { background: #384259; }
+  section:empty, .section-empty { display: none; }
+  #err { color: #d9695f; margin-top: 1rem; display: none; }
+</style>
+</head>
+<body>
+<h1>Hale Farm Cottage</h1>
+
+<section id="motion-section">
+  <h2>Motion Sensors</h2>
+  <table id="motion">
+    <thead><tr><th>Name</th><th>Temp</th><th>Motion</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="groups-section">
+  <h2>Groups</h2>
+  <table id="groups"><tbody></tbody></table>
+</section>
+
+<section id="lights-section">
+  <h2>Lights</h2>
+  <table id="lights">
+    <thead><tr><th>Name</th><th>Room</th><th>State</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<section id="alerts-section">
+  <h2>Alerts</h2>
+  <table id="alerts">
+    <thead><tr><th>Name</th><th>Room</th><th>Status</th><th></th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<!-- Devices hub has heard from but can't classify. Hidden
+     when empty, like every other section — so in normal operation you never
+     see it. When you DO, it means a device is talking and hub doesn't know
+     what it is: run `discover <name>`. Better than the old behaviour, which
+     was to say nothing at all. -->
+<section id="unknown-section">
+  <h2>Unclassified <span class="dim">— hub has heard from these but doesn't know what they are; try <code>discover &lt;name&gt;</code></span></h2>
+  <table id="unknown">
+    <thead><tr><th>Name</th><th>Room</th><th>Last reading</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<div id="err"></div>
+<script>
+function fmtTemp(centi) {
+  return centi === null ? '—' : (centi / 100).toFixed(1) + '°C';
+}
+
+function fmtMotion(occupancy) {
+  if (occupancy === null) return '—';
+  return occupancy ? 'occupied' : 'clear';
+}
+
+function fmtOnOff(on) {
+  if (on === null) return { text: 'unknown', cls: 'state-unknown' };
+  return on ? { text: 'on', cls: 'state-on' } : { text: 'off', cls: 'state-off' };
+}
+
+// Epoch seconds -> local HH:MM. The server stamps the latch in UTC epoch
+// seconds; the browser renders it in its own local time, so there's no
+// timezone handling on the server side.
+function fmtClock(epoch_s) {
+  if (!epoch_s) return '';
+  const d = new Date(epoch_s * 1000);
+  return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+}
+
+function actionButtons(target) {
+  const span = document.createElement('span');
+  for (const action of ['on', 'off', 'toggle']) {
+    const b = document.createElement('button');
+    b.textContent = action;
+    b.onclick = () => sendAction(target, action, b);
+    span.appendChild(b);
+  }
+  return span;
+}
+
+async function sendAction(target, action, btn) {
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target, action }),
+    });
+    const body = await res.json();
+    if (!res.ok || !body.ok) throw new Error(body.error || res.statusText);
+    setErr('');
+  } catch (e) {
+    setErr(target + ' ' + action + ' failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function setErr(msg) {
+  const el = document.getElementById('err');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+// A device is sorted into exactly one section, by discovered capability
+// (onoff_endpoint/occupancy_endpoint/ias_zone_endpoint -- set once at
+// `discover` time, not waiting on a first live reading): motion sensors
+// first, then alerting sensors, then individually controllable lights.
+// Anything with none of those (dimmers, rotary/dial controllers -- pure
+// input devices) is skipped entirely; the admin TUI is the place to
+// confirm those are connected, not this page.
+function categorize(d) {
+  if (d.occupancy_endpoint !== null) return 'motion';
+  if (d.ias_zone_endpoint !== null) return 'alert';
+  if (d.onoff_endpoint !== null) return 'light';
+  // A device that has SENT us something a capability implies, but whose
+  // capability we never recorded. Deliberately not hidden any more: silently dropping these is how a live, alarming moisture
+  // sensor stayed invisible on this page — hub knew it existed and knew it
+  // was alarming, and said nothing.
+  //
+  // Narrow on purpose: only readings that PROVE a capability count
+  // (alert => IAS Zone, occupancy => Occupancy, on => On/Off). Battery or
+  // temperature alone would drag the dimmer and dial in here, and those are
+  // meant to stay hidden — the TUI's config screen is where you confirm a
+  // pure input device is connected.
+  if (d.on !== null || d.alert !== null || d.occupancy !== null) return 'unknown';
+  return null;   // pure input devices (dimmer, dial): nothing to show or press
+}
+
+async function refresh() {
+  let status;
+  try {
+    const res = await fetch('/api/status');
+    status = await res.json();
+    setErr('');
+  } catch (e) {
+    setErr('status fetch failed: ' + e.message);
+    return;
+  }
+
+  const groupsBody = document.querySelector('#groups tbody');
+  groupsBody.replaceChildren();
+  for (const g of status.groups) {
+    const tr = document.createElement('tr');
+    const name = document.createElement('td');
+    name.textContent = g.name + ' (' + g.members.join(', ') + ')';
+    const controls = document.createElement('td');
+    controls.appendChild(actionButtons(g.name));
+    tr.append(name, controls);
+    groupsBody.appendChild(tr);
+  }
+  document.getElementById('groups-section').classList.toggle('section-empty', status.groups.length === 0);
+
+  const motionBody = document.querySelector('#motion tbody');
+  const lightsBody = document.querySelector('#lights tbody');
+  const alertsBody = document.querySelector('#alerts tbody');
+  const unknownBody = document.querySelector('#unknown tbody');
+  motionBody.replaceChildren();
+  lightsBody.replaceChildren();
+  alertsBody.replaceChildren();
+  unknownBody.replaceChildren();
+  let motionCount = 0, lightsCount = 0, alertsCount = 0, unknownCount = 0;
+
+  for (const d of status.devices) {
+    const label = d.name || d.ieee;
+    const category = categorize(d);
+
+    if (category === 'motion') {
+      motionCount++;
+      const tr = document.createElement('tr');
+      const name = document.createElement('td');
+      name.textContent = label;
+      const temp = document.createElement('td');
+      temp.textContent = fmtTemp(d.temperature_centi);
+      temp.className = 'dim';
+      const motion = document.createElement('td');
+      motion.textContent = fmtMotion(d.occupancy);
+      motion.className = 'dim';
+      tr.append(name, temp, motion);
+      motionBody.appendChild(tr);
+    } else if (category === 'alert') {
+      alertsCount++;
+      const tr = document.createElement('tr');
+      const name = document.createElement('td');
+      name.textContent = label;
+      const room = document.createElement('td');
+      room.textContent = d.room || '—';
+      room.className = 'dim';
+      const status_ = document.createElement('td');
+      const controls = document.createElement('td');
+      const live = d.alert === true;
+      // A latch set with the live state back to clear is a trip that came
+      // and went between polls — exactly what latching exists to catch.
+      // The acknowledge button clears it; a still-live alert can't be
+      // acknowledged away (the next report just re-latches).
+      if (live) {
+        status_.textContent = 'Alert';
+        status_.className = 'status-alert';
+      } else if (d.alert_latched) {
+        status_.textContent = 'Alert (latched ' + fmtClock(d.alert_latched_at_s) + ')';
+        status_.className = 'status-alert';
+        if (d.name) {
+          const ack = document.createElement('button');
+          ack.textContent = 'acknowledge';
+          ack.onclick = () => sendAction(d.name, 'ack', ack);
+          controls.appendChild(ack);
+        }
+      } else {
+        status_.textContent = 'OK';
+        status_.className = 'status-ok';
+      }
+      tr.append(name, room, status_, controls);
+      alertsBody.appendChild(tr);
+    } else if (category === 'light') {
+      lightsCount++;
+      const tr = document.createElement('tr');
+      const name = document.createElement('td');
+      name.textContent = label;
+      const room = document.createElement('td');
+      room.textContent = d.room || '—';
+      room.className = 'dim';
+      const state = document.createElement('td');
+      const s = fmtOnOff(d.on);
+      state.textContent = s.text;
+      state.className = s.cls;
+      const controls = document.createElement('td');
+      if (d.name) controls.appendChild(actionButtons(d.name));
+      tr.append(name, room, state, controls);
+      lightsBody.appendChild(tr);
+    } else if (category === 'unknown') {
+      unknownCount++;
+      const tr = document.createElement('tr');
+      const name = document.createElement('td');
+      name.textContent = label;
+      const room = document.createElement('td');
+      room.textContent = d.room || '—';
+      room.className = 'dim';
+      const what = document.createElement('td');
+      // Say what it DID tell us — that's the clue to what it is.
+      what.textContent = d.alert !== null ? (d.alert ? 'alarm' : 'clear')
+                       : d.occupancy !== null ? fmtMotion(d.occupancy)
+                       : fmtOnOff(d.on).text;
+      what.className = 'dim';
+      tr.append(name, room, what);
+      unknownBody.appendChild(tr);
+    }
+    // category === null (dimmer/dial/other pure input devices): skipped.
+  }
+
+  document.getElementById('motion-section').classList.toggle('section-empty', motionCount === 0);
+  document.getElementById('lights-section').classList.toggle('section-empty', lightsCount === 0);
+  document.getElementById('alerts-section').classList.toggle('section-empty', alertsCount === 0);
+  document.getElementById('unknown-section').classList.toggle('section-empty', unknownCount === 0);
+}
+
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>

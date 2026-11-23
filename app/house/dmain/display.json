@@ -1,0 +1,30 @@
+{
+  "stale_min": 120,
+  "display": [
+     { "dev": "00:17:88:01:0b:09:d6:16", "label": "TV Room", "correction": 2.09 },
+     { "dev": "00:17:88:01:0f:6a:76:d9", "label": "Lounge", "correction": 0.32 },
+     { "dev": "00:17:88:01:0b:ce:cc:28", "label": "Bedroom", "correction": 1.95 },
+     { "dev": "00:17:88:01:0b:09:ec:13", "label": "Kitchen", "correction": 1.72 },
+     { "dev": "00:17:88:01:0b:ce:21:95", "label": "Hall", "correction": 0.06 },
+     { "dev": "00:17:88:01:09:16:10:f4", "label": "Stairs", "correction": 0.87 },
+     { "dev": "00:17:88:01:10:25:b5:cf", "label": "Porch", "correction": 1.34 },
+     { "dev": "00:17:88:01:0b:ce:20:72", "label": "Bed 2", "correction": -0.43 },
+     { "dev": "00:17:88:01:0e:ba:00:02", "label": "Bed 3", "correction": -0.06 },
+     { "dev": "cc:36:bb:ff:fe:02:e1:39", "label": "Ensuite", "correction": -0.38 },
+     { "dev": "00:17:88:01:06:44:35:a4", "label": "Outside", "outside": true }
+  ],
+  "motion": [
+    { "dev": "00:17:88:01:0b:09:ec:13", "label": "Kitchen" },
+    { "dev": "00:17:88:01:0b:ce:21:95", "label": "Hall" },
+    { "dev": "00:17:88:01:09:16:10:f4", "label": "Stairs" },
+    { "dev": "00:17:88:01:0f:6a:76:d9", "label": "Lounge" },
+    { "dev": "00:17:88:01:0b:09:d6:16", "label": "TV Room" },
+    { "dev": "00:17:88:01:0b:ce:cc:28", "label": "Nightlights" },
+    { "dev": "00:17:88:01:10:25:b5:cf", "label": "Porch" },
+    { "dev": "00:17:88:01:0b:ce:20:72", "label": "Bed 2" },
+    { "dev": "00:17:88:01:0e:ba:00:02", "label": "Bed 3" },
+    { "dev": "00:17:88:01:06:44:35:a4", "label": "North Wall", "outdoor": true },
+    { "dev": "00:17:88:01:0b:d1:d1:92", "label": "South Wall", "outdoor": true },
+    { "dev": "00:17:88:01:0b:d1:9b:a6", "label": "Garage", "outdoor": true }
+  ]
+}

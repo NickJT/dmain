@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  hub as an appliance on macOS. Replace YOU below with your user name, and
+  the checkout's path if it is not ~/dmain.
+
+  *** UNVERIFIED. *** The Fedora rig (deploy/hub.service) is the appliance
+  that got tested, because it is where the radio lives — and there is only
+  one radio. This plist is the mac equivalent, written so the mac can take
+  over without a scramble if the Fedora box dies, but nobody has run it:
+  treat it the way this project treats the restore-onto-replacement-radio
+  procedure — a documented design, not a proven one. The three things most
+  likely to bite are called out below.
+
+  Install:
+      cp deploy/hub.plist ~/Library/LaunchAgents/com.hub.coordinator.plist
+      launchctl load ~/Library/LaunchAgents/com.hub.coordinator.plist
+  Stop / remove:
+      launchctl unload ~/Library/LaunchAgents/com.hub.coordinator.plist
+  Watch:  tail -f /Users/YOU/dmain/app/house/hub/hub.log     (or the paths below)
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.hub.coordinator</string>
+
+    <!-- caffeinate -s: a laptop that sleeps is a house whose light switches
+         stop working, and unlike the Fedora desktop this genuinely matters
+         here. `-s` prevents system sleep while the wrapped process lives, so
+         it needs no global pmset change and reverts when hub exits.
+         UNVERIFIED: check that caffeinate passes signals through to hub the
+         way KeepAlive expects. -->
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/caffeinate</string>
+        <string>-s</string>
+        <string>/Users/YOU/dmain/app/house/hub/zig-out/bin/hub</string>
+    </array>
+
+    <!-- The equivalent of the systemd unit's WorkingDirectory, and just as
+         load-bearing: hub reads devices.json/rules.json/groups.json/
+         schedule.json from the CWD and writes hub-devices.json/
+         hub-coordinator.json/hub.log there. Started from the wrong
+         directory it comes up with no names and no rules (an earlier version lost a
+         debugging session to exactly that). -->
+    <key>WorkingDirectory</key>
+    <string>/Users/YOU/dmain/app/house/hub</string>
+
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+
+    <!-- launchd gives an agent /dev/null on stdin, so hub sees EOF on a
+         non-tty and goes headless rather than exiting (AppState.console_eof).
+         Without that it would exit within a tick of every launch. -->
+    <key>StandardOutPath</key>
+    <string>/Users/YOU/dmain/app/house/hub/hub-launchd.out</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOU/dmain/app/house/hub/hub-launchd.err</string>
+
+    <!-- UNVERIFIED, and the most likely surprise: KeepAlive with a
+         throttled restart. launchd's default 10s respawn throttle is fine,
+         but if hub ever exits fast enough launchd may back off further.
+         The systemd side handles this explicitly (StartLimitIntervalSec=0);
+         there is no exact plist equivalent, so watch for it. -->
+</dict>
+</plist>

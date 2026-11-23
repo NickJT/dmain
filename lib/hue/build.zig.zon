@@ -1,0 +1,23 @@
+.{
+    .name = .hue,
+    .version = "0.0.0",
+    .fingerprint = 0xd6155beea3c0f73c, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{
+        // `resources` needs json_get's tolerant getters, ansi for its format
+        // helpers and time for ISO-8601 parsing. A path dependency, like every
+        // other cross-package reference here: a library change and its callers land in one commit, so there is never a
+        // version to skew.
+        .util = .{ .path = "../util" },
+        // The vocabulary `translate` writes into. The dependency points this
+        // way so that retiring the bridge retires this package, not the log.
+        .houselog = .{ .path = "../houselog" },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+        "tools",
+        "reference",
+    },
+}

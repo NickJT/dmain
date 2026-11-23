@@ -1,0 +1,4 @@
+.zig-cache/
+zig-out/
+# A switch's setup from before a change, kept on the host that made it.
+backups/

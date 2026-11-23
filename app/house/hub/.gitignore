@@ -1,0 +1,37 @@
+.DS_Store
+.zig-cache/
+zig-out/
+hub-devices.json
+# Contains the Hue Bridge's application key.
+bridge.json
+# Contains the NETWORK KEY in plaintext — never commit these.
+# The -<pan>.json variants are superseded records moved aside by `backup
+# force`; they hold real keys too.
+hub-coordinator.json
+hub-coordinator-*.json
+# writeFileAtomic's scratch files; only present if a write died mid-flight.
+*.tmp
+# The persistent event log: per-machine runtime output.
+hub.log
+# launchd's stdout/stderr capture — same, per-machine.
+hub-launchd.out
+hub-launchd.err
+# Vendor documents kept to hand (the ZCL, EZSP and Zigbee specifications, and
+# datasheets): too large to commit, and not ours to publish.
+reference/*.pdf
+pico docs/
+
+
+# Records of the decommissioned PAN 0x9928 network, set aside 2026-07-25 when
+# hub replaced its predecessor. Deliberately NOT renamed to hub-*: the hub would load them on
+# first start, try to resume a network that no longer exists, and its backup
+# write-guard would then refuse to record the new one. Kept only so the old
+# key/device table is recoverable if the decommissioning turns out to have been
+# premature — delete the directory once it clearly has not.
+decommissioned-pan-9928/
+
+# The control socket, in whatever directory hub runs from.
+hub.sock
+
+# The house log: a record of when the house is occupied. Never pushed.
+data/

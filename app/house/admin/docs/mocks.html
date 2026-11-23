@@ -1,0 +1,222 @@
+<!doctype html>
+<!-- Screen mocks for the admin app. One window per section; render.sh screenshots
+     each by its id. Every value shown is made up for the drawing. -->
+<meta charset="utf-8">
+<title>dmain admin mocks</title>
+<style>
+:root { --side:#ececef; --line:#d9d9de; --ink:#1d1d1f; --mute:#74747a; --accent:#0a64d6;
+        --differ:#b85c00; --differ-bg:#fff4e5; --bad:#c62828; --ok:#2e7d32; --stale:#a0a0a6; }
+* { box-sizing:border-box; }
+body { margin:0; font:13px/1.35 -apple-system,"SF Pro Text","Helvetica Neue",sans-serif; color:var(--ink); background:#fff; }
+.win { display:none; width:1100px; height:700px; overflow:hidden; position:relative; }
+.win:target { display:flex; }
+.side { width:196px; background:var(--side); border-right:1px solid var(--line); padding:44px 10px 0; display:flex; flex-direction:column; flex:none; }
+.side h4 { margin:12px 8px 3px; font-size:11px; color:var(--mute); font-weight:600; }
+.side .it { padding:4px 8px; border-radius:6px; display:flex; justify-content:space-between; }
+.side .it.on { background:#d5d5db; font-weight:600; }
+.side .n { color:var(--differ); font-weight:600; font-variant-numeric:tabular-nums; }
+.side .key { color:var(--stale); font-size:11px; margin-left:6px; font-weight:400; }
+.side .foot { margin-top:auto; padding:10px 8px; border-top:1px solid var(--line); font-size:11px; color:var(--mute); }
+.lights { position:absolute; top:15px; left:14px; display:flex; gap:8px; }
+.lights i { width:12px; height:12px; border-radius:50%; background:#c9c9ce; }
+.dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:var(--ok); margin-right:5px; }
+.dot.differ { background:var(--differ); } .dot.bad { background:var(--bad); } .dot.off { background:var(--stale); }
+.main { flex:1; display:flex; flex-direction:column; min-width:0; }
+.bar { height:52px; border-bottom:1px solid var(--line); display:flex; align-items:center; padding:0 18px; gap:10px; flex:none; }
+.bar h1 { font-size:15px; margin:0; } .bar .sum { color:var(--mute); } .bar .sp { flex:1; }
+.btn, .seg span, .field { border:1px solid var(--line); border-radius:6px; padding:3px 10px; background:#fff; white-space:nowrap; }
+.btn.pri { background:var(--accent); color:#fff; border-color:var(--accent); } .btn.dis { color:var(--stale); }
+.seg { display:flex; } .seg span { border-radius:0; margin-left:-1px; } .seg span:first-child { border-radius:6px 0 0 6px; } .seg span:last-child { border-radius:0 6px 6px 0; }
+.seg .on { background:#e3e3e8; font-weight:600; }
+.field { color:var(--mute); width:150px; }
+.body { flex:1; display:flex; min-height:0; } .pane { flex:1; padding:14px 18px; overflow:hidden; min-width:0; }
+.insp { width:236px; border-left:1px solid var(--line); padding:14px; background:#fafafb; flex:none; }
+.insp h3 { margin:0 0 2px; font-size:14px; } .insp h5 { margin:14px 0 4px; font-size:11px; color:var(--mute); }
+.kv { display:flex; justify-content:space-between; padding:2px 0; gap:8px; } .kv b { font-weight:400; color:var(--mute); }
+table { border-collapse:collapse; width:100%; } th { text-align:left; font-weight:600; font-size:11px; color:var(--mute); border-bottom:1px solid var(--line); padding:4px 8px; }
+td { padding:4px 8px; border-bottom:1px solid #efeff2; white-space:nowrap; } tr.differ td { background:var(--differ-bg); } tr.differ td:first-child { box-shadow:inset 3px 0 var(--differ); }
+tr.sel td { background:#dbe8fb; } .mute { color:var(--mute); } .differ-t { color:var(--differ); font-weight:600; } .bad-t { color:var(--bad); font-weight:600; }
+.card { border:1px solid var(--line); border-radius:8px; padding:9px 12px; margin-bottom:8px; display:flex; gap:12px; align-items:baseline; }
+.card .k { width:92px; font-weight:600; flex:none; } .card .go { margin-left:auto; color:var(--accent); flex:none; }
+.mono { font:12px/1.5 "SF Mono",Menlo,monospace; } .log { background:#f6f6f8; border:1px solid var(--line); border-radius:6px; padding:8px 10px; overflow:hidden; white-space:pre; }
+h2 { font-size:12px; margin:14px 0 6px; color:var(--mute); font-weight:600; }
+.sheet { position:absolute; left:330px; top:120px; width:560px; background:#fff; border:1px solid #c4c4ca; border-radius:10px; box-shadow:0 18px 50px rgba(0,0,0,.28); padding:18px; }
+.shade { position:absolute; inset:0; background:rgba(0,0,0,.12); }
+.sensors div { padding:2px 0; } .sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:-1px; }
+svg text { font:10.5px -apple-system,sans-serif; fill:var(--mute); }
+</style>
+
+<section class="win" id="attention"><div class="main">
+  <div class="bar"><h1>Attention</h1><span class="sum">5 things differ from what they should be</span></div>
+  <div class="body"><div class="pane">
+    <div class="card"><span class="k">Services</span><span><span class="differ-t">hub</span> is running an older binary: deployed 14:10, started 09:02. The deploy isn't running until a restart.</span><span class="go">Services ›</span></div>
+    <div class="card"><span class="k">Config</span><span><span class="differ-t">switches.json</span> would change 2 dimmers (dry run 14:21). Not applied.</span><span class="go">Config ›</span></div>
+    <div class="card"><span class="k">Power-on</span><span>1 of 55 lights differs: <span class="differ-t">Lounge - spot 2</span> is <i>last state</i>, wanted <i>powerfail</i>.</span><span class="go">Power-on ›</span></div>
+    <div class="card"><span class="k">Battery</span><span>1 of 34 low: <span class="differ-t">Hue dimmer switch 7</span> at 12 %.</span><span class="go">Battery ›</span></div>
+    <div class="card"><span class="k">Last heard</span><span><span class="bad-t">motion2</span> disconnected, last heard 3 h 12 min ago.</span><span class="go">Last heard ›</span></div>
+    <div class="mute" style="margin:10px 2px">Nothing differs: Firmware, Schedules. hub's console answers.</div>
+    <h2>Latest events</h2>
+    <div class="log mono">14:31:52  hue  Kitchen           motion on
+14:30:10  hub  hum1              19.4 °C  52 %
+14:28:44  hue  Study dimmer      top, short press
+14:28:44  hue  Study             on
+14:21:03  hue  Hall Ceiling      off
+14:19:37  hub  moisture          dry</div>
+  </div></div>
+</div></section>
+
+<section class="win" id="power-on"><div class="main">
+  <div class="bar"><h1>Power-on</h1><span class="sum">55 lights, 1 differs from power-on.json</span><span class="sp"></span>
+    <div class="seg"><span class="on">All</span><span>Differing</span></div><span class="field">Search</span></div>
+  <div class="body"><div class="pane" style="padding:0">
+    <table><tr><th>Name ⌃</th><th>Room</th><th>On</th><th>Now</th><th>Wanted</th></tr>
+      <tr class="differ sel"><td>Lounge - spot 2</td><td>Lounge</td><td>Bridge</td><td>last state</td><td>powerfail</td></tr>
+      <tr><td>Bed 2 Ceiling</td><td>Bed 2</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>Bed 3 Lamp</td><td>Bed 3</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>Hall Ceiling</td><td>Hall</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>Kitchen - spot 1</td><td>Kitchen</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>Kitchen - spot 2</td><td>Kitchen</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>Lounge - spot 1</td><td>Lounge</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>panel</td><td class="mute">none</td><td>hub</td><td>on, 100 %</td><td class="mute">on hub: not compared</td></tr>
+      <tr><td>Stairs</td><td>Stairs</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>Study Desk</td><td>Study</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>TV Room Ceiling</td><td>TV Room</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td>TV Room Lamp</td><td>TV Room</td><td>Bridge</td><td>powerfail</td><td>powerfail</td></tr>
+      <tr><td class="mute" colspan="5">43 more</td></tr>
+    </table></div>
+    <div class="insp"><h3>Lounge - spot 2</h3><div class="mute mono">00:17:88:01:0c:5a:11:e2</div>
+      <div class="kv" style="margin-top:8px"><b>Room</b>Lounge</div><div class="kv"><b>On</b>Bridge</div><div class="kv"><b>Model</b>LTG002</div>
+      <h5>EVERY CLASS</h5>
+      <div class="kv"><b>Power-on</b><span class="differ-t">last state</span></div><div class="kv"><b>&nbsp;&nbsp;wanted</b>powerfail</div>
+      <div class="kv"><b>Firmware</b>1.122.2</div><div class="kv"><b>Battery</b><span class="mute">mains</span></div>
+      <div class="kv"><b>Link</b>connected</div><div class="kv"><b>Last heard</b>14:02</div>
+      <h5>RECENT</h5><div class="mono" style="font-size:11px">14:02  on<br>08:15  off<br>07:40  on</div>
+      <div style="margin-top:16px"><span class="btn">Open power-on.json in Zed</span></div>
+    </div></div>
+</div></section>
+
+<section class="win" id="charts"><div class="main">
+  <div class="bar"><h1>Charts</h1><span class="sum">Fri 13 Nov 2026</span><span class="sp"></span>
+    <span class="btn">‹</span><div class="seg"><span class="on">Day</span><span>Week</span><span>Month</span><span>Range…</span></div><span class="btn">›</span>
+    <div class="seg"><span class="on">Corrected</span><span>Raw</span></div></div>
+  <div class="body"><div class="pane" style="padding:10px 6px 0 14px"><div id="chart"></div>
+    <div class="mute" style="font-size:11px;margin:6px 4px">Mirror: every day to Thu 12 Nov, today to 14:32. A gap is a sensor that stopped reporting, never a joined line.</div></div>
+    <div class="insp sensors" style="width:170px"><h5 style="margin-top:0">TEMPERATURE</h5><div id="legend"></div>
+      <h5>ALSO DRAW</h5><div>☑ Motion</div><div>☐ Humidity</div><div>☐ Outdoor motion</div></div></div>
+</div></section>
+
+<section class="win" id="config"><div class="main">
+  <div class="bar"><h1>Config</h1><span class="sum">The checkout at ~/dmain/app/house/dmain is what's applied</span></div>
+  <div class="body"><div class="pane">
+    <table><tr><th>Wanted</th><th>Files</th><th>To</th><th>Last dry run</th><th>Says</th></tr>
+      <tr><td>power-on</td><td>power-on.json</td><td>Bridge</td><td>14:20</td><td>matches</td></tr>
+      <tr class="differ sel"><td>switches</td><td>switches.json</td><td>Bridge</td><td>14:21</td><td class="differ-t">2 changes</td></tr>
+      <tr><td>hub</td><td>devices, rules, groups, schedule.json</td><td>hub</td><td>14:20</td><td>matches</td></tr></table>
+    <h2>switches: dry run 14:21, file unchanged since</h2>
+    <div class="log mono" style="height:300px">Hue dimmer switch 14 (Study)
+  bottom: Bright -> Energise
+Hue dimmer switch 3 (Dining Room)
+  top:    keep -> Relax, or off
+
+2 dimmers would change, 19 match. Nothing written.</div>
+    <div style="margin-top:12px;display:flex;gap:8px"><span class="btn">Check again</span><span class="btn">Edit in Zed</span><span class="sp" style="flex:1"></span><span class="btn pri">Apply…</span></div>
+  </div></div>
+  <div class="shade"></div>
+  <div class="sheet"><h3 style="margin:0 0 6px">Write switches.json to the Bridge?</h3>
+    <div class="mute">The dry run at 14:21 found 2 changes. Each dimmer's present setup is saved in backups/ first.</div>
+    <div class="log mono" style="margin:10px 0">Hue dimmer switch 14 (Study)        bottom: Bright -> Energise
+Hue dimmer switch 3 (Dining Room)   top:    keep -> Relax, or off</div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><span class="btn">Cancel</span><span class="btn pri">Apply 2 changes</span></div></div>
+</div></section>
+
+<section class="win" id="services"><div class="main">
+  <div class="bar"><h1>Services</h1><span class="sum">house, systemd user services</span></div>
+  <div class="body"><div class="pane">
+    <table><tr><th>Service</th><th>State</th><th>Since</th><th>Restarts</th><th>Binary</th><th></th></tr>
+      <tr><td>huelog</td><td><span class="dot"></span>active, running</td><td>Thu 12 Nov 17:44</td><td>0</td><td>as started</td><td></td></tr>
+      <tr class="differ sel"><td>hub</td><td><span class="dot"></span>active, running</td><td>today 09:02</td><td>0</td><td class="differ-t">newer than its start (14:10)</td><td><span class="btn">Restart…</span></td></tr>
+      <tr><td>dmain</td><td><span class="dot"></span>active, running</td><td>Thu 12 Nov 18:01</td><td>0</td><td>as started</td><td></td></tr></table>
+    <h2>hub: journal, following</h2>
+    <div class="log mono" style="height:400px">Nov 13 14:19:37 house hub[2214]: moisture: dry
+Nov 13 14:25:02 house hub[2214]: hum1: temperature 19.3 humidity 52
+Nov 13 14:28:11 house hub[2214]: console: list
+Nov 13 14:30:10 house hub[2214]: hum1: temperature 19.4 humidity 52
+Nov 13 14:31:40 house hub[2214]: dimmer2: top, short
+Nov 13 14:31:40 house hub[2214]: panel: on</div>
+  </div></div>
+</div></section>
+
+<section class="win" id="hub-console"><div class="main">
+  <div class="bar"><h1>hub console</h1><span class="sum"><span class="dot"></span>hub.sock answers · 5 of 9 devices joined</span></div>
+  <div class="body"><div class="pane" style="display:flex;flex-direction:column">
+    <div class="log mono" style="flex:1">&gt; list
+motion2    sensor   joined   disconnected
+panel      light    joined   on
+dimmer2    switch   joined
+moisture   sensor   joined   dry
+hum1       sensor   joined   19.4 C  52 %
+&gt; tables
+source routes 200   routes 250   children 32   neighbours 16   bindings 32
+&gt; adopt staged
+rules.json: no changes
+Type "adopt staged confirm" to load.</div>
+    <div style="display:flex;gap:8px;margin-top:10px"><span class="field mono" style="flex:1;color:var(--ink)">ack moisture▍</span><span class="btn pri">Send</span></div>
+    <div class="mute" style="font-size:11px;margin-top:6px">Sent as typed. hub's own refusals and <span class="mono">confirm</span> words decide what runs.</div>
+  </div></div>
+</div></section>
+
+<script>
+// The sidebar is the same on every screen; the counts are the rows that differ.
+const groups = [ // id, label, rows that differ, the digit dmain admin gives the same screen
+  ["House", [["attention", "Attention", 5, 0]]],
+  ["Devices", [["power-on", "Power-on", 1, 1], ["firmware", "Firmware", 0, 2], ["battery", "Battery", 1, 3], ["last-heard", "Last heard", 1, 4], ["schedules", "Schedules", 0, 5]]],
+  ["History", [["charts", "Charts"], ["log", "Log", 0, 6]]],
+  ["System", [["hub-console", "hub console", 0, 7], ["config", "Config", 1, 8], ["services", "Services", 1, 9]]],
+];
+for (const win of document.querySelectorAll(".win")) {
+  let html = '<div class="lights"><i></i><i></i><i></i></div>';
+  for (const [name, items] of groups) {
+    html += `<h4>${name}</h4>`;
+    for (const [id, label, n, key] of items)
+      html += `<div class="it${id === win.id ? " on" : ""}"><span>${label}</span><span>${n ? `<span class="n">${n}</span>` : ""}<span class="key">${key === undefined ? "" : "⌘" + key}</span></span></div>`;
+  }
+  html += '<div class="foot"><span class="dot"></span>house<br>newest record 14:32:07</div>';
+  const side = document.createElement("div");
+  side.className = "side";
+  side.innerHTML = html;
+  win.prepend(side);
+}
+
+// Temperature for a day that is still running, with a motion strip on the same axis.
+const W = 716, H = 560, L = 34, R = 62, T = 8, TH = 330, NOW = 14.53;
+const x = h => L + (W - L - R) * h / 24, y = t => T + TH * (1 - (t - 2) / 22);
+const rooms = [ // name, colour, base, swing, lag, drawn
+  ["Kitchen", "#0a64d6", 19.6, 1.9, 0.0, true], ["Lounge", "#c2410c", 21.0, 1.4, 0.6, true],
+  ["Study", "#2e7d32", 18.7, 2.3, 1.1, true], ["Bed 2", "#7b3fb5", 17.2, 1.2, 1.8, true],
+  ["Hall", "#888", 18.2, 1, 0.3, false], ["Stairs", "#888", 17.9, 1, 0.5, false],
+  ["TV Room", "#888", 19.9, 1, 0.9, false], ["Bed 3", "#888", 16.8, 1, 2, false],
+];
+const temp = (base, swing, lag, h) => base + swing * (Math.exp(-((h - 7.5 - lag) ** 2) / 5) + 0.8 * Math.exp(-((h - 18.5 - lag) ** 2) / 8)) - 0.6 * Math.cos((h - 4) * Math.PI / 12) * 0.5;
+const outside = h => 7.5 - 4 * Math.cos((h - 3.5) * Math.PI / 12);
+const path = (f, skip) => { let d = "", pen = false; for (let h = 0; h <= NOW; h += 0.25) { if (skip && h > skip[0] && h < skip[1]) { pen = false; continue; } d += `${pen ? "L" : "M"}${x(h).toFixed(1)} ${y(f(h)).toFixed(1)}`; pen = true; } return d; };
+let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">`;
+for (let t = 5; t <= 20; t += 5) s += `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="#ececf0"/><text x="${L - 6}" y="${y(t) + 3}" text-anchor="end">${t}°</text>`;
+for (let h = 0; h <= 24; h += 3) s += `<line x1="${x(h)}" x2="${x(h)}" y1="${T}" y2="${H - 18}" stroke="#f1f1f4"/><text x="${x(h)}" y="${H - 4}" text-anchor="middle">${String(h).padStart(2, "0")}:00</text>`;
+s += `<rect x="${x(3)}" y="${y(18.6)}" width="${x(5.5) - x(3)}" height="${y(15.8) - y(18.6)}" fill="#7b3fb5" opacity=".08"/><text x="${x(4.25)}" y="${y(15.8) + 12}" text-anchor="middle" style="fill:#7b3fb5">Bed 2: no reports</text>`;
+s += `<path d="${path(outside)}" fill="none" stroke="#1d1d1f" stroke-width="1.6" stroke-dasharray="5 3"/><text x="${x(NOW) + 6}" y="${y(outside(NOW)) + 3}" style="fill:#1d1d1f">Outside</text>`;
+for (const [name, colour, base, swing, lag, drawn] of rooms) {
+  if (!drawn) continue;
+  const f = h => temp(base, swing, lag, h);
+  s += `<path d="${path(f, name === "Bed 2" ? [3, 5.5] : null)}" fill="none" stroke="${colour}" stroke-width="1.8"/><text x="${x(NOW) + 6}" y="${y(f(NOW)) + 3}" style="fill:${colour}">${name}</text>`;
+}
+s += `<line x1="${x(NOW)}" x2="${x(NOW)}" y1="${T}" y2="${H - 18}" stroke="#b85c00" stroke-dasharray="2 2"/><text x="${x(NOW)}" y="${T + 9}" text-anchor="end" dx="-4" style="fill:#b85c00">14:32</text>`;
+const strips = { Kitchen: [[6.8, 8.4], [12.2, 13.1], [14.2, 14.5]], Lounge: [[8.5, 9.2], [13.1, 14.3]], Study: [[9.3, 12.1], [13.4, 14.53]], "Bed 2": [[0.1, 0.3], [6.4, 6.9]] };
+let row = 0;
+for (const [name, spans] of Object.entries(strips)) {
+  const top = T + TH + 30 + row++ * 38, colour = rooms.find(r => r[0] === name)[1];
+  s += `<text x="${L}" y="${top - 5}">${name} motion</text><rect x="${L}" y="${top}" width="${x(NOW) - L}" height="14" fill="#f1f1f4"/>`;
+  for (const [a, b] of spans) s += `<rect x="${x(a)}" y="${top}" width="${Math.max(2, x(b) - x(a))}" height="14" fill="${colour}"/>`;
+}
+document.getElementById("chart").innerHTML = s + "</svg>";
+document.getElementById("legend").innerHTML = rooms.map(([name, colour, , , , drawn]) => `<div>${drawn ? "☑" : "☐"} <span class="sw" style="background:${drawn ? colour : "#ccc"}"></span>${name}</div>`).join("") + '<div>☑ <span class="sw" style="background:#1d1d1f"></span>Outside</div>';
+</script>

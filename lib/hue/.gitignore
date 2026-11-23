@@ -1,0 +1,3 @@
+# Hue developer pages saved for reading; only the SSE schema is ours.
+reference/*
+!reference/hue-sse-events.md

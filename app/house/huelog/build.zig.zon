@@ -1,0 +1,16 @@
+.{
+    .name = .huelog,
+    .version = "0.0.0",
+    .fingerprint = 0x18d1f5cd01510554, // Changing this has security and trust implications.
+    .minimum_zig_version = "0.17.0",
+    .dependencies = .{
+        .util = .{ .path = "../../../lib/util" },
+        .hue = .{ .path = "../../../lib/hue" },
+        .houselog = .{ .path = "../../../lib/houselog" },
+    },
+    .paths = .{
+        "build.zig",
+        "build.zig.zon",
+        "src",
+    },
+}

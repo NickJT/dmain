@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/icon-192.png">
+<title>Motion</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main>
+  <div id="banner" role="status"></div>
+  <ul id="rows" class="compact"></ul>
+  <footer><span id="foot">Loading…</span><a href="/">Temperatures</a><a href="/rooms">Rooms</a></footer>
+</main>
+<script src="/common.js"></script>
+<script>
+  const rows = document.getElementById("rows");
+
+  // The clock time alone for today, the weekday within a week, the date beyond.
+  function clock(ms, ageS) {
+    const d = new Date(ms);
+    const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    if (d.toDateString() === new Date().toDateString()) return time;
+    if (ageS < 6 * 86400) return d.toLocaleDateString([], { weekday: "short" }) + " " + time;
+    return d.toLocaleDateString([], { day: "numeric", month: "short" });
+  }
+
+  // Built with textContent throughout: labels come from a config file, and
+  // nothing from it is ever parsed as markup.
+  function render(d) {
+    let outdoors = false;
+    rows.replaceChildren(...d.rows.map((r) => {
+      const li = document.createElement("li");
+      if (r.lost) li.classList.add("stale");
+      if (r.outdoor && !outdoors) { li.classList.add("group"); outdoors = true; }
+      const left = document.createElement("div");
+      const name = document.createElement("div");
+      name.className = "name";
+      name.textContent = r.label;
+      const age = document.createElement("div");
+      age.className = "age";
+      age.textContent = r.lost ? "link lost" : r.on ? "motion now" : ago(r.age_s, "no motion known");
+      left.append(name, age);
+      const when = document.createElement("div");
+      when.className = "when";
+      if (r.on) {
+        when.classList.add("now");
+        when.textContent = "Now";
+      } else if (r.last_ms == null) {
+        when.textContent = "—";
+      } else {
+        if (r.age_s >= 86400) when.classList.add("older");
+        when.textContent = clock(r.last_ms, r.age_s);
+      }
+      li.append(left, when);
+      return li;
+    }));
+  }
+
+  poll("/api/motion", render);
+</script>
+</body>
+</html>

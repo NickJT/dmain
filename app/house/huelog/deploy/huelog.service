@@ -1,0 +1,35 @@
+# huelog as an appliance: the only client of the Hue bridge, captured per day.
+#
+# Install as the user who owns ~/huelog, not root:
+#     mkdir -p ~/.config/systemd/user
+#     cp huelog.service ~/.config/systemd/user/
+#     systemctl --user daemon-reload
+#     systemctl --user enable --now huelog
+#     loginctl enable-linger $USER      # so it runs with nobody logged in
+#
+# Watch it:  journalctl _SYSTEMD_USER_UNIT=huelog.service -f -o cat
+# (`journalctl --user` can find nothing; the system journal has it.)
+# Data:      ~/huelog/data/raw/ and data/house/, YYYY-MM-DD.jsonl
+
+[Unit]
+Description=huelog — the Hue bridge, captured verbatim per day
+# Never stop restarting: systemd's default start limit gives up after five
+# quick starts, and a boot-time crash loop would end with nothing logging.
+StartLimitIntervalSec=0
+# Best-effort only: huelog retries the bridge every 5 s forever.
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+# huelog reads huelog.json and writes data/ relative to the working directory.
+WorkingDirectory=%h/huelog
+ExecStart=%h/huelog/huelog
+Restart=always
+RestartSec=5
+StandardInput=null
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
