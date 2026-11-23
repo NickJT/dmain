@@ -1,13 +1,13 @@
 # dmain
 
 **dmain** (from domain/demesne) is a local-only home automation system for a single house. It is written in Zig 0.17 with a macOS management app. Dmain does three things:
-- creates and manages a vendor neutral Zigbee network using the Home Assistant Connect ZBT-2
+- creates and manages a vendor neutral Zigbee network using a ZBT-2 radio (or similar hardware)
 - interfaces to a Philips Hue Bridge, so that devices the Bridge can't handle work alongside the Hue lights and switches. 
 - provides a macOS app to configure and monitor the system from the desktop, keeping the Bridge's own setup consistent from a single file describing the house.
 
-The primary motivation is to provide a way of extending a Hue system to include devices that are not available (e.g. humidity) and optionally to support a gradual migration of devices from an increasingly cloud-based, closed platform to a local, open source platform. 
+The primary motivation is to provide a way of extending a Hue system to include devices that are not available (e.g. humidity) and, optionally, to support a gradual migration of devices from an increasingly cloud-based, closed platform to a local, open source platform. 
 
-A secondary motivation was to provide desktop configuration and management and avoid using the (IMHO) over-stuffed Hue app. Obviously, this would not be possible without the truly excellent support that Philips provide for their open API.
+A secondary motivation was to provide desktop configuration and management and avoid using the (IMHO) over-stuffed Hue app. Obviously, this would not be possible without the truly excellent support that Philips provides for its open API.
 
 ## Things to know before reading further
 - **It is functionally specific, not a general platform.** A core design aim was to work directly with specific devices for a small range of functions (light, motion, humidity, temperature, socket switching). There are no adaptors or abstractions for devices it doesn't have (xkcd 927, obviously). Treat it as a worked example to adapt and build-on, not as a black-box platform to install (if you are looking for a ready-made, local, easy to use platform with **vast** compatibility reach, then try the Home Assistant ecosystem).
